@@ -98,6 +98,92 @@ app.get('/api', (req, res) => {
   });
 });
 
+// เพิ่มโค้ดนี้ใน server.js หลังจาก health check endpoint
+
+// Database test endpoint
+app.get('/test-db', async (req, res) => {
+  try {
+    const { query } = require('./src/config/database');
+    
+    // Test 1: Basic connection
+    const timeResult = await query('SELECT NOW() as current_time');
+    
+    // Test 2: Check if nursing_schedule_db database exists
+    const dbResult = await query('SELECT current_database() as database_name');
+    
+    // Test 3: List all tables in public schema
+    const tablesResult = await query(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+      ORDER BY table_name
+    `);
+    
+    // Test 4: Check specific nursing schedule tables
+    const nursingTables = [
+      'users', 'students', 'instructors', 'sections', 'groups',
+      'courses', 'activity_types', 'locations', 'schedules', 
+      'schedule_groups', 'attendance', 'notifications', 
+      'system_settings', 'audit_logs'
+    ];
+    
+    const existingTables = tablesResult.rows.map(row => row.table_name);
+    const missingTables = nursingTables.filter(table => !existingTables.includes(table));
+    const foundTables = nursingTables.filter(table => existingTables.includes(table));
+    
+    // Test 5: Check users table structure (if exists)
+    let usersTableInfo = null;
+    if (existingTables.includes('users')) {
+      const usersInfo = await query(`
+        SELECT column_name, data_type, is_nullable
+        FROM information_schema.columns 
+        WHERE table_name = 'users' 
+        ORDER BY ordinal_position
+      `);
+      usersTableInfo = usersInfo.rows;
+    }
+    
+    res.json({
+      success: true,
+      message: 'Database connection test completed',
+      tests: {
+        connection: {
+          status: 'SUCCESS',
+          current_time: timeResult.rows[0].current_time,
+          database_name: dbResult.rows[0].database_name
+        },
+        tables: {
+          total_tables: existingTables.length,
+          nursing_tables_found: foundTables.length,
+          nursing_tables_missing: missingTables.length,
+          found_tables: foundTables,
+          missing_tables: missingTables,
+          all_tables: existingTables
+        },
+        users_table: usersTableInfo ? {
+          exists: true,
+          columns: usersTableInfo
+        } : {
+          exists: false,
+          message: 'Users table not found'
+        }
+      }
+    });
+    
+  } catch (error) {
+    console.error('Database test error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Database connection test failed',
+      error: {
+        message: error.message,
+        code: error.code,
+        detail: error.detail
+      }
+    });
+  }
+});
+
 // API Routes (จะเพิ่มเมื่อสร้าง routes)
 // app.use('/api/auth', require('./src/routes/auth'));
 // app.use('/api/users', require('./src/routes/users'));
