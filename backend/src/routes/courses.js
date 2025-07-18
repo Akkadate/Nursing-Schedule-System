@@ -27,7 +27,7 @@ router.get('/:id',
 router.post('/', 
   requireAdmin,
   [
-    require('express-validator').body('course_ame')
+    require('express-validator').body('course_name')
       .notEmpty()
       .withMessage('กรุณากรอกชื่อรายวิชา')
       .isLength({ max: 200 })
@@ -42,7 +42,7 @@ router.post('/',
       .withMessage('กรุณากรอกรหัสวิชา')
       .isLength({ max: 20 })
       .withMessage('รหัสวิชาไม่เกิน 20 ตัวอักษร'),
-    require('express-validator').body('credits_hours')
+    require('express-validator').body('credit_hours')
       .isInt({ min: 1, max: 10 })
       .withMessage('หน่วยกิตต้องเป็น 1-10'),
      require('express-validator').body('theory_hours')
@@ -66,7 +66,7 @@ router.post('/',
       .isLength({ max: 20 })
       .withMessage('รหัสวิชาไม่เกิน 20 ตัวอักษร'),
       require('express-validator').body('status')
-      .notEmpty()
+      .optional()
       .withMessage('status')
       .isLength({ max: 20 })
       .withMessage('รหัสวิชาไม่เกิน 20 ตัวอักษร')
