@@ -27,44 +27,29 @@ router.get('/:id',
 router.post('/', 
   requireAdmin,
   [
-    require('express-validator').body('course_name')
+    require('express-validator').body('courseName')
       .notEmpty()
       .withMessage('กรุณากรอกชื่อรายวิชา')
       .isLength({ max: 200 })
       .withMessage('ชื่อรายวิชาไม่เกิน 200 ตัวอักษร'),
-    require('express-validator').body('course_code')
+    require('express-validator').body('courseCode')
       .notEmpty()
       .withMessage('กรุณากรอกรหัสวิชา')
       .isLength({ max: 20 })
       .withMessage('รหัสวิชาไม่เกิน 20 ตัวอักษร'),
-      require('express-validator').body('course_name_en')
-      .notEmpty()
-      .withMessage('กรุณากรอกรหัสวิชา')
-      .isLength({ max: 20 })
-      .withMessage('รหัสวิชาไม่เกิน 20 ตัวอักษร'),
-    require('express-validator').body('credit_hours')
+    require('express-validator').body('credits')
       .isInt({ min: 1, max: 10 })
       .withMessage('หน่วยกิตต้องเป็น 1-10'),
-     require('express-validator').body('theory_hours')
-      .isInt({ min: 1, max: 10 })
-      .withMessage('sss'),
-      require('express-validator').body('practice_hours')
-      .isInt({ min: 1, max: 10 })
-      .withMessage('xxx'),
+    require('express-validator').body('yearLevel')
+      .isInt({ min: 1, max: 4 })
+      .withMessage('ชั้นปีต้องเป็น 1-4'),
+    require('express-validator').body('semester')
+      .isInt({ min: 1, max: 3 })
+      .withMessage('ภาคเรียนต้องเป็น 1, 2 หรือ 3'),
     require('express-validator').body('description')
       .optional()
       .isLength({ max: 1000 })
-      .withMessage('คำอธิบายไม่เกิน 1000 ตัวอักษร'),
-     require('express-validator').body('year_level')
-      .isInt({ min: 1, max: 10 })
-      .withMessage('sss'),
-    require('express-validator').body('semester')
-      .isInt({ min: 1, max: 10 })
-      .withMessage('กรุณา semester'),
-    require('express-validator').body('status')
-      .optional()
-      .isLength({ max: 1000 })
-      .withMessage('คำอธิบายไม่เกิน 1000 ตัวอักษร'),
+      .withMessage('คำอธิบายไม่เกิน 1000 ตัวอักษร')
   ],
   handleValidationErrors,
   courseController.create
@@ -75,13 +60,13 @@ router.put('/:id',
   requireAdmin,
   validationRules.idParam,
   [
-    require('express-validator').body('course_name')
+    require('express-validator').body('courseName')
       .optional()
       .notEmpty()
       .withMessage('ชื่อรายวิชาไม่สามารถเป็นค่าว่างได้')
       .isLength({ max: 200 })
       .withMessage('ชื่อรายวิชาไม่เกิน 200 ตัวอักษร'),
-    require('express-validator').body('credit_hours')
+    require('express-validator').body('credits')
       .optional()
       .isInt({ min: 1, max: 10 })
       .withMessage('หน่วยกิตต้องเป็น 1-10'),
