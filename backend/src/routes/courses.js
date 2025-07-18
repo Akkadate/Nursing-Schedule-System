@@ -56,10 +56,8 @@ router.post('/',
       .isLength({ max: 1000 })
       .withMessage('คำอธิบายไม่เกิน 1000 ตัวอักษร'),
      require('express-validator').body('year_level')
-      .notEmpty()
-      .withMessage('กรุณากรอกปี')
-      .isLength({ max: 20 })
-      .withMessage('รหัสวิชาไม่เกิน 20 ตัวอักษร'),
+      .isInt({ min: 1, max: 10 })
+      .withMessage('sss'),
     require('express-validator').body('semester')
       .isInt({ min: 1, max: 10 })
       .withMessage('กรุณา semester'),
