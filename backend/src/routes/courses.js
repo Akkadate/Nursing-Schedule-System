@@ -27,29 +27,49 @@ router.get('/:id',
 router.post('/', 
   requireAdmin,
   [
-    require('express-validator').body('courseName')
+    require('express-validator').body('course_ame')
       .notEmpty()
       .withMessage('กรุณากรอกชื่อรายวิชา')
       .isLength({ max: 200 })
       .withMessage('ชื่อรายวิชาไม่เกิน 200 ตัวอักษร'),
-    require('express-validator').body('courseCode')
+    require('express-validator').body('course_code')
       .notEmpty()
       .withMessage('กรุณากรอกรหัสวิชา')
       .isLength({ max: 20 })
       .withMessage('รหัสวิชาไม่เกิน 20 ตัวอักษร'),
-    require('express-validator').body('credits')
+      require('express-validator').body('course_name_en')
+      .notEmpty()
+      .withMessage('กรุณากรอกรหัสวิชา')
+      .isLength({ max: 20 })
+      .withMessage('รหัสวิชาไม่เกิน 20 ตัวอักษร'),
+    require('express-validator').body('credits_hours')
       .isInt({ min: 1, max: 10 })
       .withMessage('หน่วยกิตต้องเป็น 1-10'),
-    require('express-validator').body('yearLevel')
-      .isInt({ min: 1, max: 4 })
-      .withMessage('ชั้นปีต้องเป็น 1-4'),
-    require('express-validator').body('semester')
-      .isInt({ min: 1, max: 3 })
-      .withMessage('ภาคเรียนต้องเป็น 1, 2 หรือ 3'),
+     require('express-validator').body('theory_hours')
+      .isInt({ min: 1, max: 10 })
+      .withMessage('sss'),
+      require('express-validator').body('practice_hours')
+      .isInt({ min: 1, max: 10 })
+      .withMessage('xxx'),
     require('express-validator').body('description')
       .optional()
       .isLength({ max: 1000 })
-      .withMessage('คำอธิบายไม่เกิน 1000 ตัวอักษร')
+      .withMessage('คำอธิบายไม่เกิน 1000 ตัวอักษร'),
+     require('express-validator').body('year_level')
+      .notEmpty()
+      .withMessage('กรุณากรอกปี')
+      .isLength({ max: 20 })
+      .withMessage('รหัสวิชาไม่เกิน 20 ตัวอักษร'),
+      require('express-validator').body('semester')
+      .notEmpty()
+      .withMessage('กรุณา semester')
+      .isLength({ max: 20 })
+      .withMessage('รหัสวิชาไม่เกิน 20 ตัวอักษร'),
+      require('express-validator').body('status')
+      .notEmpty()
+      .withMessage('status')
+      .isLength({ max: 20 })
+      .withMessage('รหัสวิชาไม่เกิน 20 ตัวอักษร')
   ],
   handleValidationErrors,
   courseController.create
