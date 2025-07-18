@@ -75,13 +75,13 @@ router.put('/:id',
   requireAdmin,
   validationRules.idParam,
   [
-    require('express-validator').body('courseName')
+    require('express-validator').body('course_name')
       .optional()
       .notEmpty()
       .withMessage('ชื่อรายวิชาไม่สามารถเป็นค่าว่างได้')
       .isLength({ max: 200 })
       .withMessage('ชื่อรายวิชาไม่เกิน 200 ตัวอักษร'),
-    require('express-validator').body('credits')
+    require('express-validator').body('credit_hours')
       .optional()
       .isInt({ min: 1, max: 10 })
       .withMessage('หน่วยกิตต้องเป็น 1-10'),
