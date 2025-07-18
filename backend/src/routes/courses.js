@@ -60,16 +60,13 @@ router.post('/',
       .withMessage('กรุณากรอกปี')
       .isLength({ max: 20 })
       .withMessage('รหัสวิชาไม่เกิน 20 ตัวอักษร'),
-      require('express-validator').body('semester')
-      .notEmpty()
-      .withMessage('กรุณา semester')
-      .isLength({ max: 20 })
-      .withMessage('รหัสวิชาไม่เกิน 20 ตัวอักษร'),
-      require('express-validator').body('status')
+    require('express-validator').body('semester')
+      .isInt({ min: 1, max: 10 })
+      .withMessage('กรุณา semester'),
+    require('express-validator').body('status')
       .optional()
-      .withMessage('status')
-      .isLength({ max: 20 })
-      .withMessage('รหัสวิชาไม่เกิน 20 ตัวอักษร')
+      .isLength({ max: 1000 })
+      .withMessage('คำอธิบายไม่เกิน 1000 ตัวอักษร'),
   ],
   handleValidationErrors,
   courseController.create
