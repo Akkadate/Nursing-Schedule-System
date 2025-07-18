@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const pool = require('../config/database');  // <-- เพิ่มบรรทัดนี้
+const bcrypt = require('bcrypt');             // <-- เพิ่มบรรทัดนี้ด้วย
 const authController = require('../controllers/authController');
 const { authMiddleware } = require('../middleware/auth');
 const { validationRules, handleValidationErrors } = require('../middleware/validation');
