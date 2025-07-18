@@ -8,8 +8,8 @@ const rateLimit = require('express-rate-limit');
 
 // Import middleware
 const { authMiddleware, requireRole } = require('./src/middleware/auth');
-const errorHandler = require('./src/middleware/errorHandler');
-const logger = require('./src/utils/logger');
+const { errorHandler } = require('./src/middleware/errorHandler');
+const { logger } = require('./src/utils/logger');
 
 // Import routes
 // Phase 2 Routes
