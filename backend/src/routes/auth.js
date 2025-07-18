@@ -44,7 +44,8 @@ router.get('/verify-token',
   authMiddleware,
   authController.verifyToken
 );
-// POST /api/auth/register - สร้างผู้ใช้ใหม่ (Admin only for first user)
+
+// POST /api/auth/register - สร้างผู้ใช้ใหม่ (สำหรับสร้าง admin คนแรก)
 router.post('/register', async (req, res) => {
   try {
     const {
@@ -53,7 +54,7 @@ router.post('/register', async (req, res) => {
       email,
       first_name,
       last_name,
-      role = 'instructor'
+      role = 'admin'
     } = req.body;
     
     // Validation
@@ -64,24 +65,34 @@ router.post('/register', async (req, res) => {
       });
     }
     
-    // ตรวจสอบว่ามี admin ในระบบแล้วหรือไม่
-    const adminCheck = await pool.query(
-      'SELECT COUNT(*) FROM users WHERE role = $1',
-      ['admin']
-    );
-    
-    const adminCount = parseInt(adminCheck.rows[0].count);
-    
-    // ถ้ายังไม่มี admin ให้สร้าง admin ได้
-    // ถ้ามี admin แล้ว ต้องมี authorization
-    if (adminCount > 0 && role === 'admin') {
-      return res.status(403).json({
+    if (password.length < 6) {
+      return res.status(400).json({
         success: false,
-        message: 'ไม่สามารถสร้าง admin เพิ่มได้ กรุณาติดต่อผู้ดูแลระบบ'
+        message: 'รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร'
       });
     }
     
-    // ตรวจสอบ username ซ้ำ
+    // ตรวจสอบว่ามีผู้ใช้ในระบบแล้วหรือไม่
+    const userCount = await pool.query('SELECT COUNT(*) FROM users');
+    const totalUsers = parseInt(userCount.rows[0].count);
+    
+    // ถ้ามีผู้ใช้แล้ว และพยายามสร้าง admin จะไม่ให้
+    if (totalUsers > 0 && role === 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'ระบบมีผู้ใช้แล้ว ไม่สามารถสร้าง admin เพิ่มได้'
+      });
+    }
+    
+    // ถ้ายังไม่มีผู้ใช้เลย ต้องสร้าง admin
+    if (totalUsers === 0 && role !== 'admin') {
+      return res.status(400).json({
+        success: false,
+        message: 'ผู้ใช้คนแรกต้องเป็น admin'
+      });
+    }
+    
+    // ตรวจสอบ username และ email ซ้ำ
     const existingUser = await pool.query(
       'SELECT user_id FROM users WHERE username = $1 OR email = $2',
       [username, email]
@@ -108,10 +119,21 @@ router.post('/register', async (req, res) => {
       RETURNING user_id, username, email, first_name, last_name, role, status, created_at
     `, [username, password_hash, email, first_name, last_name, role]);
     
+    const newUser = result.rows[0];
+    
     res.status(201).json({
       success: true,
-      message: 'สร้างผู้ใช้สำเร็จ',
-      data: result.rows[0]
+      message: `สร้าง${role === 'admin' ? 'ผู้ดูแลระบบ' : 'ผู้ใช้'}สำเร็จ`,
+      data: {
+        user_id: newUser.user_id,
+        username: newUser.username,
+        email: newUser.email,
+        first_name: newUser.first_name,
+        last_name: newUser.last_name,
+        role: newUser.role,
+        status: newUser.status,
+        created_at: newUser.created_at
+      }
     });
     
   } catch (error) {
